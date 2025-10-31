@@ -1,0 +1,453 @@
+swagger: "2.0"
+info:
+  title: API de Gerenciamento Escolar
+  version: "1.0"
+  description: API para gerenciamento de Professores e Turmas
+
+host: ""
+basePath: /
+schemes:
+  - http
+
+paths:
+  # -------- Professores --------
+  /professores:
+    get:
+      summary: Listar todos os professores
+      tags:
+        - Professores
+      responses:
+        200:
+          description: Lista de professores
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Professor'
+    post:
+      summary: Criar um novo professor
+      tags:
+        - Professores
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/ProfessorInput'
+      responses:
+        201:
+          description: Professor criado com sucesso
+          schema:
+            $ref: '#/definitions/ProfessorCriado'
+        400:
+          description: Dados inválidos
+
+  /professores/{professor_id}:
+    get:
+      summary: Obter professor por ID
+      tags:
+        - Professores
+      parameters:
+        - in: path
+          name: professor_id
+          type: integer
+          required: true
+      responses:
+        200:
+          description: Professor encontrado
+          schema:
+            $ref: '#/definitions/Professor'
+        404:
+          description: Professor não encontrado
+    put:
+      summary: Atualizar professor existente
+      tags:
+        - Professores
+      parameters:
+        - in: path
+          name: professor_id
+          type: integer
+          required: true
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/ProfessorInput'
+      responses:
+        200:
+          description: Professor atualizado com sucesso
+        404:
+          description: Professor não encontrado
+    delete:
+      summary: Deletar professor
+      description: Deleta um professor apenas se não houver turmas vinculadas a ele
+      tags:
+        - Professores
+      parameters:
+        - in: path
+          name: professor_id
+          type: integer
+          required: true
+      responses:
+        200:
+          description: Professor deletado com sucesso
+        404:
+          description: Professor não encontrado
+        409:
+          description: Conflito - professor possui turmas vinculadas
+          schema:
+            type: object
+            properties:
+              erro:
+                type: string
+                example: "Não é possível deletar o professor pois existem turmas vinculadas."
+        500:
+          description: Erro interno do servidor
+
+  # -------- Turmas --------
+  /turmas:
+    get:
+      summary: Listar todas as turmas
+      tags:
+        - Turmas
+      responses:
+        200:
+          description: Lista de turmas
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Turma'
+    post:
+      summary: Criar uma nova turma
+      description: Cria uma turma vinculada a um professor existente
+      tags:
+        - Turmas
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/TurmaInput'
+      responses:
+        201:
+          description: Turma criada com sucesso
+          schema:
+            $ref: '#/definitions/TurmaCriada'
+        400:
+          description: Dados inválidos ou ID de professor inexistente
+          schema:
+            type: object
+            properties:
+              erro:
+                type: string
+                example: "Professor com id 5 não existe."
+        500:
+          description: Erro interno do servidor
+
+  /turmas/{turma_id}:
+    get:
+      summary: Obter turma por ID
+      tags:
+        - Turmas
+      parameters:
+        - in: path
+          name: turma_id
+          type: integer
+          required: true
+      responses:
+        200:
+          description: Turma encontrada
+          schema:
+            $ref: '#/definitions/Turma'
+        404:
+          description: Turma não encontrada
+    put:
+      summary: Atualizar turma existente
+      tags:
+        - Turmas
+      parameters:
+        - in: path
+          name: turma_id
+          type: integer
+          required: true
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/TurmaInput'
+      responses:
+        200:
+          description: Turma atualizada com sucesso
+        400:
+          description: Dados inválidos ou ID de professor inexistente
+          schema:
+            type: object
+            properties:
+              erro:
+                type: string
+                example: "Professor com id 5 não existe."
+        404:
+          description: Turma não encontrada
+    delete:
+      summary: Deletar turma
+      description: Deleta uma turma apenas se não houver alunos vinculados a ela
+      tags:
+        - Turmas
+      parameters:
+        - in: path
+          name: turma_id
+          type: integer
+          required: true
+      responses:
+        200:
+          description: Turma deletada com sucesso
+        404:
+          description: Turma não encontrada
+        409:
+          description: Conflito - turma possui alunos vinculados
+          schema:
+            type: object
+            properties:
+              erro:
+                type: string
+                example: "Não é possível deletar a turma pois existem alunos vinculados."
+        500:
+          description: Erro interno do servidor
+
+  # -------- Alunos --------
+  /alunos:
+    get:
+      summary: Listar todos os alunos
+      tags:
+        - Alunos
+      responses:
+        200:
+          description: Lista de alunos
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Aluno'
+    post:
+      summary: Criar um novo aluno
+      description: Cria um aluno vinculado a uma turma existente
+      tags:
+        - Alunos
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/AlunoInput'
+      responses:
+        201:
+          description: Aluno criado com sucesso
+          schema:
+            $ref: '#/definitions/AlunoCriado'
+        400:
+          description: Dados inválidos ou ID de turma inexistente
+          schema:
+            type: object
+            properties:
+              erro:
+                type: string
+                example: "Turma com id 10 não existe."
+        500:
+          description: Erro interno do servidor
+
+  /alunos/{aluno_id}:
+    get:
+      summary: Obter aluno por ID
+      tags:
+        - Alunos
+      parameters:
+        - in: path
+          name: aluno_id
+          type: integer
+          required: true
+      responses:
+        200:
+          description: Aluno encontrado
+          schema:
+            $ref: '#/definitions/Aluno'
+        404:
+          description: Aluno não encontrado
+    put:
+      summary: Atualizar aluno existente
+      tags:
+        - Alunos
+      parameters:
+        - in: path
+          name: aluno_id
+          type: integer
+          required: true
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/AlunoInput'
+      responses:
+        200:
+          description: Aluno atualizado com sucesso
+        400:
+          description: Dados inválidos ou ID de turma inexistente
+          schema:
+            type: object
+            properties:
+              erro:
+                type: string
+                example: "Turma com id 10 não existe."
+        404:
+          description: Aluno não encontrado
+    delete:
+      summary: Deletar aluno
+      tags:
+        - Alunos
+      parameters:
+        - in: path
+          name: aluno_id
+          type: integer
+          required: true
+      responses:
+        200:
+          description: Aluno deletado com sucesso
+        404:
+          description: Aluno não encontrado
+
+# -------- Schemas --------
+definitions:
+  ProfessorBase:
+    type: object
+    properties:
+      nome:
+        type: string
+        example: "João Silva"
+      idade:
+        type: integer
+        example: 40
+      materia:
+        type: string
+        example: "Matemática"
+      observacoes:
+        type: string
+        example: "Professor titular da turma 101"
+
+  Professor:
+    allOf:
+      - $ref: '#/definitions/ProfessorBase'
+      - type: object
+        properties:
+          id:
+            type: integer
+            example: 1
+
+  ProfessorInput:
+    allOf:
+      - $ref: '#/definitions/ProfessorBase'
+    required:
+      - nome
+      - idade
+      - materia
+
+  ProfessorCriado:
+    allOf:
+      - $ref: '#/definitions/Professor'
+      - type: object
+        properties:
+          mensagem:
+            type: string
+            example: "Professor criado com sucesso!"
+
+  TurmaBase:
+    type: object
+    properties:
+      nome:
+        type: string
+        example: "Turma 101"
+      professor_id:
+        type: integer
+        example: 1
+      ativo:
+        type: boolean
+        example: true
+
+  Turma:
+    allOf:
+      - $ref: '#/definitions/TurmaBase'
+      - type: object
+        properties:
+          id:
+            type: integer
+            example: 10
+
+  TurmaInput:
+    allOf:
+      - $ref: '#/definitions/TurmaBase'
+    required:
+      - nome
+      - professor_id
+
+  TurmaCriada:
+    allOf:
+      - $ref: '#/definitions/Turma'
+      - type: object
+        properties:
+          mensagem:
+            type: string
+            example: "Turma criada com sucesso!"
+
+  AlunoBase:
+    type: object
+    properties:
+      nome:
+        type: string
+        example: "Maria Santos"
+      idade:
+        type: integer
+        example: 18
+      turma_id:
+        type: integer
+        example: 1
+      data_nascimento:
+        type: string
+        format: date
+        example: "2006-10-07"
+      nota_primeiro_semestre:
+        type: number
+        format: float
+        example: 7.5
+      nota_segundo_semestre:
+        type: number
+        format: float
+        example: 8.0
+
+  Aluno:
+    allOf:
+      - $ref: '#/definitions/AlunoBase'
+      - type: object
+        properties:
+          id:
+            type: integer
+            example: 1
+          média_final:
+            type: number
+            format: float
+            example: 7.75
+
+  AlunoInput:
+    allOf:
+      - $ref: '#/definitions/AlunoBase'
+    required:
+      - nome
+      - idade
+      - turma_id
+      - data_nascimento
+      - nota_primeiro_semestre
+      - nota_segundo_semestre
+
+  AlunoCriado:
+    allOf:
+      - $ref: '#/definitions/Aluno'
+      - type: object
+        properties:
+          mensagem:
+            type: string
+            example: "Aluno criado com sucesso!"
