@@ -1,5 +1,5 @@
-from flask import jsonify, request
 import requests
+from flask import jsonify, request
 from models import Atividades, banco_atv
 from sqlalchemy.exc import IntegrityError
 
