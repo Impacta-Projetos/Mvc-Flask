@@ -2,7 +2,7 @@ swagger: "2.0"
 info:
   title: API de Gerenciamento Escolar
   version: "1.0"
-  description: API para gerenciamento de Professores e Turmas
+  description: API para gerenciamento de Professores, Turmas e Alunos
 
 host: ""
 basePath: /
