@@ -1,0 +1,158 @@
+swagger: "2.0"
+info:
+  title: API de Atividades Escolares
+  version: "1.0"
+  description: API para gerenciamento de Atividades Escolares
+
+host: ""
+basePath: /
+schemes:
+  - http
+
+paths:
+  # -------- Atividades --------
+  /atividades:
+    get:
+      summary: Listar todas as atividades
+      tags:
+        - Atividades
+      responses:
+        200:
+          description: Lista de atividades
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Atividade'
+    post:
+      summary: Criar uma nova atividade
+      tags:
+        - Atividades
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/AtividadeInput'
+      responses:
+        201:
+          description: Atividade criada com sucesso
+          schema:
+            $ref: '#/definitions/AtividadeCriada'
+        400:
+          description: Dados inválidos
+
+  /atividades/{atividade_id}:
+    get:
+      summary: Obter atividade por ID
+      tags:
+        - Atividades
+      parameters:
+        - in: path
+          name: atividade_id
+          type: integer
+          required: true
+      responses:
+        200:
+          description: Atividade encontrada
+          schema:
+            $ref: '#/definitions/Atividade'
+        404:
+          description: Atividade não encontrada
+    put:
+      summary: Atualizar atividade existente
+      tags:
+        - Atividades
+      parameters:
+        - in: path
+          name: atividade_id
+          type: integer
+          required: true
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/AtividadeInput'
+      responses:
+        200:
+          description: Atividade atualizada com sucesso
+        404:
+          description: Atividade não encontrada
+    delete:
+      summary: Deletar atividade
+      description: Deleta uma atividade apenas se não houver notas vinculadas a ela
+      tags:
+        - Atividades
+      parameters:
+        - in: path
+          name: atividade_id
+          type: integer
+          required: true
+      responses:
+        200:
+          description: Atividade deletada com sucesso
+        404:
+          description: Atividade não encontrada
+        409:
+          description: Conflito - atividade possui notas vinculadas
+          schema:
+            type: object
+            properties:
+              erro:
+                type: string
+                example: "Não é possível deletar a atividade pois existem notas vinculadas."
+        500:
+          description: Erro interno do servidor
+
+# -------- Schemas --------
+definitions:
+  AtividadeBase:
+    type: object
+    properties:
+      nome_atividade:
+        type: string
+        example: "Atividade de Matemática"
+      descricao:
+        type: string
+        example: "Resolução de exercícios de matemática"
+      peso_porcento:
+        type: integer
+        example: 20
+      data_entrega:
+        type: string
+        format: date
+        example: "2023-09-30"
+      turma_id:
+        type: integer
+        example: 1
+      professor_id:
+        type: integer
+        example: 1
+
+  Atividade:
+    allOf:
+      - $ref: '#/definitions/AtividadeBase'
+      - type: object
+        properties:
+          id:
+            type: integer
+            example: 1
+
+  AtividadeInput:
+    allOf:
+      - $ref: '#/definitions/AtividadeBase'
+    required:
+      - nome_atividade
+      - descricao
+      - peso_porcento
+      - data_entrega
+      - turma_id
+      - professor_id
+
+  AtividadeCriada:
+    allOf:
+      - $ref: '#/definitions/Atividade'
+      - type: object
+        properties:
+          mensagem:
+            type: string
+            example: "Atividade criada com sucesso!"
