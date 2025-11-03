@@ -1,0 +1,283 @@
+swagger: "2.0"
+info:
+  title: API de Atividades Escolares
+  version: "1.0"
+  description: API para gerenciamento de Atividades Escolares
+
+host: ""
+basePath: /
+schemes:
+  - http
+
+paths:
+  # -------- Reservas --------
+  /reservas:
+    get:
+      summary: Listar todas as reservas
+      tags:
+        - reservas
+      responses:
+        200:
+          description: Lista de reservas
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Reserva'
+    post:
+      summary: Criar uma nova reserva
+      tags:
+        - AtivReservaidades
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/ReservaInput'
+      responses:
+        201:
+          description: Reserva criada com sucesso
+          schema:
+            $ref: '#/definitions/ReservaCriada'
+        400:
+          description: Dados inválidos
+
+  /atividades/{atividade_id}:
+    get:
+      summary: Obter reserva por ID
+      tags:
+        - Reservas
+      parameters:
+        - in: path
+          name: reserva_id
+          type: integer
+          required: true
+      responses:
+        200:
+          description: Reserva encontrada
+          schema:
+            $ref: '#/definitions/Reserva'
+        404:
+          description: Reserva não encontrada
+    put:
+      summary: Atualizar Reserva existente
+      tags:
+        - Reserva
+      parameters:
+        - in: path
+          name: reserva_id
+          type: integer
+          required: true
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/ReservaInput'
+      responses:
+        200:
+          description: Reserva atualizada com sucesso
+        404:
+          description: Reserva não encontrada
+    delete:
+      summary: Deletar reserva
+      description: Deleta uma reserva
+      tags:
+        - Reserva
+      parameters:
+        - in: path
+          name: reserva_id
+          type: integer
+          required: true
+      responses:
+        200:
+          description: Reserva deletada com sucesso
+        404:
+          description: Reserva não encontrada
+        409:
+          description: Conflito - reserva não deletada
+          schema:
+            type: object
+            properties:
+              erro:
+                type: string
+                example: "Não é possível deletar a reserva"
+        500:
+          description: Erro interno do servidor
+
+# -------- Schemas --------
+definitions:
+  AtividadeBase:
+    type: object
+    properties:
+      nome_atividade:
+        type: string
+        example: "Reserva de laboratorio"
+      descricao:
+        type: string
+        example: "Resolução de exercícios de matemática"
+      peso_porcento:
+        type: integer
+        example: 20
+      data_entrega:
+        type: string
+        format: date
+        example: "2023-09-30"
+      turma_id:
+        type: integer
+        example: 1
+      professor_id:
+        type: integer
+        example: 1
+
+  Atividade:
+    allOf:
+      - $ref: '#/definitions/AtividadeBase'
+      - type: object
+        properties:
+          id:
+            type: integer
+            example: 1
+
+  AtividadeInput:
+    allOf:
+      - $ref: '#/definitions/AtividadeBase'
+    required:
+      - nome_atividade
+      - descricao
+      - peso_porcento
+      - data_entrega
+      - turma_id
+      - professor_id
+
+  AtividadeCriada:
+    allOf:
+      - $ref: '#/definitions/Atividade'
+      - type: object
+        properties:
+          mensagem:
+            type: string
+            example: "Atividade criada com sucesso!"
+
+  # -------- Notas --------
+  /notas:
+    get:
+      summary: Listar todas as notas
+      tags:
+        - Notas
+      responses:
+        200:
+          description: Lista de notas
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Nota'
+    post:
+      summary: Criar uma nova nota
+      tags:
+        - Notas
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/NotaInput'
+      responses:
+        201:
+          description: Nota criada com sucesso
+          schema:
+            $ref: '#/definitions/NotaCriada'
+        400:
+          description: Dados inválidos
+
+  /notas/{nota_id}:
+    get:
+      summary: Obter nota por ID
+      tags:
+        - Notas
+      parameters:
+        - in: path
+          name: nota_id
+          type: integer
+          required: true
+      responses:
+        200:
+          description: Nota encontrada
+          schema:
+            $ref: '#/definitions/Nota'
+        404:
+          description: Nota não encontrada
+    put:
+      summary: Atualizar nota existente
+      tags:
+        - Notas
+      parameters:
+        - in: path
+          name: nota_id
+          type: integer
+          required: true
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/NotaInput'
+      responses:
+        200:
+          description: Nota atualizada com sucesso
+        404:
+          description: Nota não encontrada
+    delete:
+      summary: Deletar nota
+      description: Deleta uma nota
+        - Notas
+      parameters:
+        - in: path
+          name: nota_id
+          type: integer
+          required: true
+      responses:
+        200:
+          description: Nota deletada com sucesso
+        404:
+          description: Nota não encontrada
+        500:
+          description: Erro interno do servidor
+
+# -------- Schemas --------
+definitions:
+  NotasBase:
+    type: object
+    properties:
+      nota:
+        type: float
+        example: 8.5
+      aluno_id: 
+        type: integer
+        example: 1
+      atividade_id:
+        type: integer
+        example: 1
+
+  Nota:
+    allOf:
+      - $ref: '#/definitions/NotasBase'
+      - type: object
+        properties:
+          id:
+            type: integer
+            example: 1
+
+  NotaInput:
+    allOf:
+      - $ref: '#/definitions/NotasBase'
+    required:
+      - nota
+      - aluno_id
+      - atividade_id
+
+  NotaCriada:
+    allOf:
+      - $ref: '#/definitions/Nota'
+      - type: object
+        properties:
+          mensagem:
+            type: string
+            example: "Nota criada com sucesso!"
