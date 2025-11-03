@@ -14,10 +14,6 @@ class AlunoController:
                       'idade': aluno.idade,
                       'turma_id': aluno.turma_id,
                       'data_nascimento': aluno.data_nascimento.strftime('%Y-%m-%d') if aluno.data_nascimento else None,
-                      'nota_primeiro_semestre': aluno.nota_primeiro_semestre,
-                      'nota_segundo_semestre': aluno.nota_segundo_semestre,
-                      "media_final": (aluno.nota_primeiro_semestre + aluno.nota_segundo_semestre) / 2
-
                   } for aluno in alunos
               ]
               return jsonify(resultado), 200
@@ -27,9 +23,9 @@ class AlunoController:
      @staticmethod
      def criar_aluno():
          dados = request.get_json()
-         campos_obrigatorios = ['nome', 'idade', 'turma_id', 'data_nascimento', 'nota_primeiro_semestre', 'nota_segundo_semestre']
+         campos_obrigatorios = ['nome', 'idade', 'turma_id', 'data_nascimento']
          if not dados or not all(k in dados for k in campos_obrigatorios):
-             return jsonify({'erro': 'nome, idade, turma_id, data_nascimento, nota_primeiro_semestre e nota_segundo_semestre são campos obrigatórios.'}), 400
+             return jsonify({'erro': 'nome, idade, turma_id, data_nascimento são campos obrigatórios.'}), 400
          turma_id = dados['turma_id']
          turma = Turma.query.get(turma_id)
          if not turma:
@@ -45,8 +41,6 @@ class AlunoController:
                 idade = dados['idade'],
                 turma_id = dados['turma_id'],
                 data_nascimento = data_nascimento,
-                nota_primeiro_semestre = dados['nota_primeiro_semestre'],
-                nota_segundo_semestre = dados['nota_segundo_semestre']
              )
          except ValueError:
              return jsonify({'erro': 'Formato de data inválido. Use YYYY-MM-DD.'}), 400
@@ -64,9 +58,6 @@ class AlunoController:
                  'idade': novo_aluno.idade,
                  'turma_id': novo_aluno.turma_id,
                  'data_nascimento': novo_aluno.data_nascimento.strftime('%Y-%m-%d'),
-                 'nota_primeiro_semestre': novo_aluno.nota_primeiro_semestre,
-                 'nota_segundo_semestre': novo_aluno.nota_segundo_semestre,
-                 "média_final": (novo_aluno.nota_primeiro_semestre + novo_aluno.nota_segundo_semestre) / 2
              }), 201
          except Exception as e:
              banco_de_dados.session.rollback()
@@ -82,9 +73,6 @@ class AlunoController:
                  'idade': aluno.idade,
                  'turma_id': aluno.turma_id,
                  'data_nascimento': aluno.data_nascimento.strftime('%Y-%m-%d'),
-                 'nota_primeiro_semestre': aluno.nota_primeiro_semestre,
-                 'nota_segundo_semestre': aluno.nota_segundo_semestre,
-                 'media_final': (aluno.nota_primeiro_semestre + aluno.nota_segundo_semestre) / 2
              }), 200
          else:
              return jsonify({'erro': 'Aluno não encontrado.'}), 404
@@ -97,8 +85,6 @@ class AlunoController:
              aluno.nome = dados.get('nome', aluno.nome)
              aluno.idade = dados.get('idade', aluno.idade)
              aluno.turma_id = dados.get('turma_id', aluno.turma_id)
-             aluno.nota_primeiro_semestre = dados.get('nota_primeiro_semestre', aluno.nota_primeiro_semestre)
-             aluno.nota_segundo_semestre = dados.get('nota_segundo_semestre', aluno.nota_segundo_semestre)
 
              turma = Turma.query.get(dados.get('turma_id'))
              if not turma:
