@@ -6,10 +6,10 @@ sys.path.append(str(arquivo_src))
 import os
 from flask import Flask
 from config.config import Config
-from models import banco_atv
+from src.models import banco_atv
 from flasgger import Swagger
-from api.atividades.api_atividades import rotas_atividades
-from api.notas.api_notas import rotas_notas
+from src.api.atividades.api_atividades import rotas_atividades
+from src.api.notas.api_notas import rotas_notas
 
 app = Flask(__name__)
 app.config.from_object(Config)

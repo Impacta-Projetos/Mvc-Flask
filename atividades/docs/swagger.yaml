@@ -155,4 +155,133 @@ definitions:
         properties:
           mensagem:
             type: string
+<<<<<<< HEAD
             example: "Atividade criada com sucesso!"
+=======
+            example: "Atividade criada com sucesso!"
+
+  # -------- Notas --------
+  /notas:
+    get:
+      summary: Listar todas as notas
+      tags:
+        - Notas
+      responses:
+        200:
+          description: Lista de notas
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Nota'
+    post:
+      summary: Criar uma nova nota
+      tags:
+        - Notas
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/NotaInput'
+      responses:
+        201:
+          description: Nota criada com sucesso
+          schema:
+            $ref: '#/definitions/NotaCriada'
+        400:
+          description: Dados inválidos
+
+  /notas/{nota_id}:
+    get:
+      summary: Obter nota por ID
+      tags:
+        - Notas
+      parameters:
+        - in: path
+          name: nota_id
+          type: integer
+          required: true
+      responses:
+        200:
+          description: Nota encontrada
+          schema:
+            $ref: '#/definitions/Nota'
+        404:
+          description: Nota não encontrada
+    put:
+      summary: Atualizar nota existente
+      tags:
+        - Notas
+      parameters:
+        - in: path
+          name: nota_id
+          type: integer
+          required: true
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/NotaInput'
+      responses:
+        200:
+          description: Nota atualizada com sucesso
+        404:
+          description: Nota não encontrada
+    delete:
+      summary: Deletar nota
+      description: Deleta uma nota
+        - Notas
+      parameters:
+        - in: path
+          name: nota_id
+          type: integer
+          required: true
+      responses:
+        200:
+          description: Nota deletada com sucesso
+        404:
+          description: Nota não encontrada
+        500:
+          description: Erro interno do servidor
+
+# -------- Schemas --------
+definitions:
+  NotasBase:
+    type: object
+    properties:
+      nota:
+        type: float
+        example: 8.5
+      aluno_id: 
+        type: integer
+        example: 1
+      atividade_id:
+        type: integer
+        example: 1
+
+  Nota:
+    allOf:
+      - $ref: '#/definitions/NotasBase'
+      - type: object
+        properties:
+          id:
+            type: integer
+            example: 1
+
+  NotaInput:
+    allOf:
+      - $ref: '#/definitions/NotasBase'
+    required:
+      - nota
+      - aluno_id
+      - atividade_id
+
+  NotaCriada:
+    allOf:
+      - $ref: '#/definitions/Nota'
+      - type: object
+        properties:
+          mensagem:
+            type: string
+            example: "Nota criada com sucesso!"
+>>>>>>> origin
