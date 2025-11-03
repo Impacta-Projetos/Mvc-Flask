@@ -7,6 +7,6 @@ RUN mkdir -p /app/instance
 ENV FLASK_APP=main.py
 ENV FLASK_ENV=production
 ENV FLASK_RUN_HOST=0.0.0.0
-ENV FLASK_RUN_PORT=5000
-EXPOSE 5000
+ENV FLASK_RUN_PORT=5002
+EXPOSE 5002
 CMD ["python", "main.py"]
