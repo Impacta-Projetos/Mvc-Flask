@@ -155,9 +155,6 @@ definitions:
         properties:
           mensagem:
             type: string
-<<<<<<< HEAD
-            example: "Atividade criada com sucesso!"
-=======
             example: "Atividade criada com sucesso!"
 
   # -------- Notas --------
@@ -284,4 +281,3 @@ definitions:
           mensagem:
             type: string
             example: "Nota criada com sucesso!"
->>>>>>> origin
