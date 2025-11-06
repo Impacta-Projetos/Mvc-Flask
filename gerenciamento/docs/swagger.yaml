@@ -7,7 +7,7 @@ info:
 host: ""
 basePath: /
 schemes:
-  - http
+  - https
 
 paths:
   # -------- Professores --------
