@@ -42,12 +42,12 @@ class AtividadesController:
                     'nome_atividade': atividade.nome_atividade,
                     'descricao': atividade.descricao,
                     'peso_porcento': atividade.peso_porcento,
-                    'data_entrega': atividade.data_entrega,
+                    'data_entrega': atividade.data_entrega.strftime('%Y-%m-%d %H:%M:%S') if atividade.data_entrega else None,
                     'turma_id': atividade.turma_id,
                     'professor_id': atividade.professor_id
                 } for atividade in atividades
-            ], 200
-            return jsonify(resultado)
+            ]
+            return jsonify(resultado), 200
         else:
             return jsonify({'mensagem': 'Nenhuma atividade encontrada.'}), 200
         
@@ -61,7 +61,7 @@ class AtividadesController:
                     'nome_atividade': atividade.nome_atividade,
                     'descricao': atividade.descricao,
                     'peso_porcento': atividade.peso_porcento,
-                    'data_entrega': atividade.data_entrega,
+                    'data_entrega': atividade.data_entrega.strftime('%Y-%m-%d %H:%M:%S') if atividade.data_entrega else None,
                     'turma_id': atividade.turma_id,
                     'professor_id': atividade.professor_id
                 }

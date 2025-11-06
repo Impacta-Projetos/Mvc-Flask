@@ -8,7 +8,7 @@ class Notas(banco_atv.Model):
     aluno_id = banco_atv.Column(banco_atv.Integer, nullable=False)
     atividade_id = banco_atv.Column(banco_atv.Integer, banco_atv.ForeignKey('atividades.id'), nullable=False)
 
-    notas = banco_atv.relationship('Atividades', back_populates='notas')
+    atividade = banco_atv.relationship('Atividades', back_populates='atividades')
 
     def __repr__(self):
         return f"<Nota(id={self.id}, nota={self.nota}, aluno_id={self.aluno_id}, atividade_id={self.atividade_id})>"

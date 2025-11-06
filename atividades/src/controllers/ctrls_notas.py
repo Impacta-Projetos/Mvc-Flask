@@ -29,8 +29,8 @@ class NotasController:
                     'aluno_id': nota.aluno_id,
                     'atividade_id': nota.atividade_id,
                 } for nota in notas 
-            ], 200
-            return jsonify(resultado)  
+            ]
+            return jsonify(resultado), 200  
         else:
             return jsonify({'mensagem': 'Nenhuma nota encontrada.'}), 200
 
