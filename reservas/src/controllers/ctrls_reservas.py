@@ -65,8 +65,8 @@ class ReservasController:
              return jsonify({'erro': f'Erro ao processar dados: {str(e)}'}), 400
 
          try:
-             banco_de_dados.session.add(nova_reserva)
-             banco_de_dados.session.commit()
+             banco_res.session.add(nova_reserva)
+             banco_res.session.commit()
              
              return jsonify({
                  'mensagem': 'Aluno criado com sucesso!',
@@ -77,7 +77,7 @@ class ReservasController:
                  'data_nascimento': nova_reserva.data.strftime('%Y-%m-%d'),
              }), 201
          except Exception as e:
-             banco_de_dados.session.rollback()
+             banco_res.session.rollback()
              return jsonify({'erro': f'Erro ao salvar no banco: {str(e)}'}), 500
          
      @staticmethod
@@ -106,7 +106,7 @@ class ReservasController:
              valido_turma, msg_turma = validar_turma(dados['turma_id'])
              if not valido_prof:
                  return jsonify({'erro': f'Turma com id {dados.get("turma_id")} não existe.'}), 400
-             banco_de_dados.session.commit()
+             banco_res.session.commit()
              return jsonify({'mensagem': 'Aluno atualizado com sucesso!'}), 200
          else:
              return jsonify({'erro': 'Aluno não encontrado.'}), 404
@@ -115,8 +115,8 @@ class ReservasController:
      def deletar_reserva(reserva_id):
          reserva = Reservas.query.get(reserva_id)
          if reserva:
-             banco_de_dados.session.delete(reserva)
-             banco_de_dados.session.commit()
+             banco_res.session.delete(reserva)
+             banco_res.session.commit()
              return jsonify({'mensagem': 'Reserva deletada com sucesso!'}), 200
          else:
              return jsonify({'erro': 'Reserva não encontrada.'}), 404
