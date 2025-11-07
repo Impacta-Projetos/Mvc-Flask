@@ -1,8 +1,15 @@
 from . import banco_res
 
+
+
 class Reservas(banco_res.Model):
-    id = banco_de_dados.Column(banco_de_dados.Integer, primary_key=True)
-    num_sala = banco_de_dados.Column(banco_de_dados.Integer, nullable=False)
-    lab = banco_de_dados.Column(banco_de_dados.Boolean, nullable=False)
-    data = banco_de_dados.Column(banco_de_dados.Date, nullable=False)
-    turma_id = banco_atv.Column(banco_atv.Integer, nullable=False)
+    __tablename__ = "reservas"
+
+    id = banco_res.Column(banco_de_dados.Integer, primary_key=True)
+    num_sala = banco_res.Column(banco_de_dados.Integer, nullable=False)
+    lab = banco_res.Column(banco_de_dados.Boolean, nullable=False)
+    data = banco_res.Column(banco_de_dados.Date, nullable=False)
+    turma_id = banco_res.Column(banco_atv.Integer, nullable=False)
+
+     def __repr__(self):
+        return f"<Reserva(id={self.id}, num_sala={self.num_sala}, lab={self.lab}, data={self.data}, turma_id={self.turma_id})>"
