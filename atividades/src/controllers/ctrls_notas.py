@@ -1,7 +1,7 @@
 import requests
 from flask import jsonify, request
-from models import Notas, banco_atv
-from sqlalchemy.exc import IntegrityError
+from models import Notas, Atividades, banco_atv
+from sqlalchemy.exc import ServerError
 
 def validar_aluno(aluno_id):
     try:
@@ -60,6 +60,10 @@ class NotasController:
         if not valido_aluno:
             return jsonify({'erro': 'Aluno inválido.', 'detalhes': [msg_aluno]}), 400
 
+        atividade = Atividades.query.get(dados['atividade_id'])
+        if not atividade:
+            return jsonify({'erro': f'Atividade com id {dados["atividade_id"]} não existe.'}), 400
+
         nova_nota = Notas(
             nota=dados['nota'],
             aluno_id=dados['aluno_id'],
@@ -69,9 +73,12 @@ class NotasController:
             banco_atv.session.add(nova_nota)
             banco_atv.session.commit()
             return jsonify({'mensagem': 'Nota criada com sucesso.'}), 201
-        except IntegrityError:
+        except Exception as e:
             banco_atv.session.rollback()
-            return jsonify({'erro': 'Erro ao criar nota. Verifique os dados e tente novamente.'}), 400
+            return jsonify({'erro': f'Erro ao criar nota: {str(e)}'}), 400
+        except ServerError as e:
+            banco_atv.session.rollback()
+            return jsonify({'erro': f'Erro ao criar nota: {str(e)}'}), 500
 
     @staticmethod
     def atualizar_nota(nota_id):
@@ -79,12 +86,16 @@ class NotasController:
         if nota:
             dados = request.get_json()
             nota.nota = dados.get('nota', nota.nota)
-            aluno_id = dados.get('aluno_id', nota.aluno_id)
-            #linha com atividade_id foi removida daqui, pois estava dando erro de uso. 
+            nota.aluno_id = dados.get('aluno_id', nota.aluno_id)
+            nota.atividade_id = dados.get('atividade_id', nota.atividade_id)
 
-            valido_aluno, msg_aluno = validar_aluno(aluno_id)
+            valido_aluno, msg_aluno = validar_aluno(dados['aluno_id'])
             if not valido_aluno:
                 return jsonify({'erro': 'Aluno inválido.', 'detalhes': [msg_aluno]}), 400
+            
+            atividade = Atividades.query.get(dados.get('atividade_id'))
+            if not atividade:
+                return jsonify({'erro': f'Atividade com id {dados.get("atividade_id")} não existe.'}), 400
 
             nota.nota = dados.get('nota', nota.nota)
             nota.aluno_id = dados.get('aluno_id', nota.aluno_id)
@@ -93,9 +104,12 @@ class NotasController:
             try:
                 banco_atv.session.commit()
                 return jsonify({'mensagem': 'Nota atualizada com sucesso.'}), 200
-            except IntegrityError:
+            except Exception as e:
                 banco_atv.session.rollback()
-                return jsonify({'erro': 'Erro ao atualizar nota. Verifique os dados e tente novamente.'}), 400
+                return jsonify({'erro': f'Erro ao atualizar nota: {str(e)}'}), 400
+            except ServerError as e:
+                banco_atv.session.rollback()
+                return jsonify({'erro': f'Erro ao atualizar nota: {str(e)}'}), 500
         else:
             return jsonify({'erro': 'Nota não encontrada.'}), 404
 
@@ -107,9 +121,12 @@ class NotasController:
                 banco_atv.session.delete(nota)
                 banco_atv.session.commit()
                 return jsonify({'mensagem': 'Nota deletada com sucesso.'}), 200
-            except IntegrityError:
+            except Exception as e:
                 banco_atv.session.rollback()
-                return jsonify({'erro': 'Erro ao deletar nota. Tente novamente mais tarde.'}), 400
+                return jsonify({'erro': f'Erro ao deletar nota: {str(e)}'}), 400
+            except ServerError as e:
+                banco_atv.session.rollback()
+                return jsonify({'erro': f'Erro ao deletar nota: {str(e)}'}), 500
         else:
             return jsonify({'erro': 'Nota não encontrada.'}), 404
         

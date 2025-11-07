@@ -1,7 +1,8 @@
 import requests
 from flask import jsonify, request
 from models import Atividades, banco_atv
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, ServerError
+from datetime import datetime
 
 def validar_professor(professor_id):
     try:
@@ -81,11 +82,17 @@ class AtividadesController:
         if not valido_turma or not valido_prof:
             return jsonify({'erro': 'Turma ou professor inválido.', 'detalhes': [msg_turma, msg_prof]}), 400
         
+        # Converter string de data para objeto datetime
+        try:
+            data_entrega = datetime.strptime(dados['data_entrega'], '%Y-%m-%d')
+        except ValueError:
+            return jsonify({'erro': 'Formato de data inválido. Use YYYY-MM-DD.'}), 400
+        
         nova_atividade = Atividades(
             nome_atividade = dados['nome_atividade'],
             descricao = dados['descricao'],
             peso_porcento = dados['peso_porcento'],
-            data_entrega = dados['data_entrega'],
+            data_entrega = data_entrega,
             turma_id = dados['turma_id'],
             professor_id = dados['professor_id']
         )
@@ -93,10 +100,13 @@ class AtividadesController:
             banco_atv.session.add(nova_atividade)
             banco_atv.session.commit()
             return jsonify({'mensagem': 'Atividade criada com sucesso.'}), 201
-        except IntegrityError:
+        except Exception as e:
             banco_atv.session.rollback()
-            return jsonify({'erro': 'Erro ao criar atividade. Verifique os dados e tente novamente.'}), 400
-        
+            return jsonify({'erro': f'Erro ao criar atividade: {str(e)}'}), 400
+        except ServerError as e:
+            banco_atv.session.rollback()
+            return jsonify({'erro': f'Erro ao criar atividade: {str(e)}'}), 500
+
     @staticmethod
     def atualizar_atividade(atividade_id):
         atividade = Atividades.query.get(atividade_id)
@@ -110,19 +120,31 @@ class AtividadesController:
             if not valido_turma or not valido_prof:
                 return jsonify({'erro': 'Turma ou professor inválido.', 'detalhes': [msg_turma, msg_prof]}), 400
             
+            # Converter string de data para objeto datetime se fornecido
+            if 'data_entrega' in dados:
+                try:
+                    data_entrega = datetime.strptime(dados['data_entrega'], '%Y-%m-%d')
+                except ValueError:
+                    return jsonify({'erro': 'Formato de data inválido. Use YYYY-MM-DD.'}), 400
+            else:
+                data_entrega = atividade.data_entrega
+            
             atividade.nome_atividade = dados.get('nome_atividade', atividade.nome_atividade)
             atividade.descricao = dados.get('descricao', atividade.descricao)
             atividade.peso_porcento = dados.get('peso_porcento', atividade.peso_porcento)
-            atividade.data_entrega = dados.get('data_entrega', atividade.data_entrega)
+            atividade.data_entrega = data_entrega
             atividade.turma_id = turma_id
             atividade.professor_id = professor_id
 
             try:
                 banco_atv.session.commit()
                 return jsonify({'mensagem': 'Atividade atualizada com sucesso.'}), 200
-            except IntegrityError:
+            except Exception as e:
                 banco_atv.session.rollback()
-                return jsonify({'erro': 'Erro ao atualizar atividade. Verifique os dados e tente novamente.'}), 400
+                return jsonify({'erro': f'Erro ao atualizar atividade: {str(e)}'}), 400
+            except ServerError as e:
+                banco_atv.session.rollback()
+                return jsonify({'erro': f'Erro ao atualizar atividade: {str(e)}'}), 500
         else:
             return jsonify({'erro': 'Atividade não encontrada.'}), 404
             
@@ -136,6 +158,12 @@ class AtividadesController:
                 return jsonify({'mensagem': 'Atividade deletada com sucesso.'}), 200
             except IntegrityError:
                 banco_atv.session.rollback()
-                return jsonify({'erro': 'Erro ao deletar atividade. Tente novamente mais tarde.'}), 400
+                return jsonify({'erro': 'Não é possível deletar a atividade pois existem notas vinculadas.'}), 409
+            except Exception:
+                banco_atv.session.rollback()
+                return jsonify({'erro': 'Erro ao deletar atividade.'}), 400
+            except ServerError as e:
+                banco_atv.session.rollback()
+                return jsonify({'erro': f'Erro ao deletar atividade: {str(e)}'}), 500
         else:
             return jsonify({'erro': 'Atividade não encontrada.'}), 404
