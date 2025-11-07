@@ -1,7 +1,6 @@
 import requests
 from flask import jsonify, request
 from models import Notas, Atividades, banco_atv
-from sqlalchemy.exc import ServerError
 
 def validar_aluno(aluno_id):
     try:
@@ -76,9 +75,6 @@ class NotasController:
         except Exception as e:
             banco_atv.session.rollback()
             return jsonify({'erro': f'Erro ao criar nota: {str(e)}'}), 400
-        except ServerError as e:
-            banco_atv.session.rollback()
-            return jsonify({'erro': f'Erro ao criar nota: {str(e)}'}), 500
 
     @staticmethod
     def atualizar_nota(nota_id):
@@ -107,9 +103,6 @@ class NotasController:
             except Exception as e:
                 banco_atv.session.rollback()
                 return jsonify({'erro': f'Erro ao atualizar nota: {str(e)}'}), 400
-            except ServerError as e:
-                banco_atv.session.rollback()
-                return jsonify({'erro': f'Erro ao atualizar nota: {str(e)}'}), 500
         else:
             return jsonify({'erro': 'Nota não encontrada.'}), 404
 
@@ -124,9 +117,6 @@ class NotasController:
             except Exception as e:
                 banco_atv.session.rollback()
                 return jsonify({'erro': f'Erro ao deletar nota: {str(e)}'}), 400
-            except ServerError as e:
-                banco_atv.session.rollback()
-                return jsonify({'erro': f'Erro ao deletar nota: {str(e)}'}), 500
         else:
             return jsonify({'erro': 'Nota não encontrada.'}), 404
         

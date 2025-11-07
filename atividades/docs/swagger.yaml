@@ -40,8 +40,6 @@ paths:
             $ref: '#/definitions/AtividadeCriada'
         400:
           description: Dados inválidos
-        500:
-          description: Erro interno do servidor
 
   /atividades/{atividade_id}:
     get:
@@ -81,8 +79,6 @@ paths:
           description: Dados inválidos
         404:
           description: Atividade não encontrada
-        500:
-          description: Erro interno do servidor
     delete:
       summary: Deletar atividade
       description: Deleta uma atividade apenas se não houver notas vinculadas a ela
@@ -106,8 +102,6 @@ paths:
               erro:
                 type: string
                 example: "Não é possível deletar a atividade pois existem notas vinculadas."
-        500:
-          description: Erro interno do servidor
 
   # -------- Notas --------
   /notas:
@@ -139,8 +133,6 @@ paths:
             $ref: '#/definitions/NotaCriada'
         400:
           description: Dados inválidos
-        500:
-          description: Erro interno do servidor
 
   /notas/{nota_id}:
     get:
@@ -178,8 +170,6 @@ paths:
           description: Nota atualizada com sucesso
         404:
           description: Nota não encontrada
-        500:
-          description: Erro interno do servidor
     delete:
       summary: Deletar nota
       description: Deleta uma nota
@@ -195,8 +185,6 @@ paths:
           description: Nota deletada com sucesso
         404:
           description: Nota não encontrada
-        500:
-          description: Erro interno do servidor
 
 # -------- Schemas --------
 definitions:

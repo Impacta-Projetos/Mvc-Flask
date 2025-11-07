@@ -1,7 +1,7 @@
 import requests
 from flask import jsonify, request
 from models import Atividades, banco_atv
-from sqlalchemy.exc import IntegrityError, ServerError
+from sqlalchemy.exc import IntegrityError
 from datetime import datetime
 
 def validar_professor(professor_id):
@@ -103,9 +103,6 @@ class AtividadesController:
         except Exception as e:
             banco_atv.session.rollback()
             return jsonify({'erro': f'Erro ao criar atividade: {str(e)}'}), 400
-        except ServerError as e:
-            banco_atv.session.rollback()
-            return jsonify({'erro': f'Erro ao criar atividade: {str(e)}'}), 500
 
     @staticmethod
     def atualizar_atividade(atividade_id):
@@ -142,9 +139,6 @@ class AtividadesController:
             except Exception as e:
                 banco_atv.session.rollback()
                 return jsonify({'erro': f'Erro ao atualizar atividade: {str(e)}'}), 400
-            except ServerError as e:
-                banco_atv.session.rollback()
-                return jsonify({'erro': f'Erro ao atualizar atividade: {str(e)}'}), 500
         else:
             return jsonify({'erro': 'Atividade não encontrada.'}), 404
             
@@ -162,8 +156,5 @@ class AtividadesController:
             except Exception:
                 banco_atv.session.rollback()
                 return jsonify({'erro': 'Erro ao deletar atividade.'}), 400
-            except ServerError as e:
-                banco_atv.session.rollback()
-                return jsonify({'erro': f'Erro ao deletar atividade: {str(e)}'}), 500
         else:
             return jsonify({'erro': 'Atividade não encontrada.'}), 404
