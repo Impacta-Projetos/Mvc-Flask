@@ -1,7 +1,6 @@
 import requests
 from flask import jsonify, request
 from models import Reservas, banco_res
-from sqlalchemy.exc import IntegrityError
 from datetime import datetime
 
 class ReservasController:
@@ -40,9 +39,9 @@ class ReservasController:
     @staticmethod
     def criar_reserva():
         dados = request.get_json()
-        campos_obrigatorios = ['num_sala', 'lab', 'data', 'turma_id']
+        campos_obrigatorios = ['num_sala', 'data', 'turma_id']
         if not dados or not all(k in dados for k in campos_obrigatorios):
-            return jsonify({'erro': 'num_sala, lab, data e turma_id são campos obrigatórios.'}), 400
+            return jsonify({'erro': 'num_sala, data e turma_id são campos obrigatórios.'}), 400
 
         valido_turma, msg_turma = ReservasController.validar_turma(dados['turma_id'])
         if not valido_turma:
@@ -52,7 +51,7 @@ class ReservasController:
             data = datetime.strptime(dados['data'], '%Y-%m-%d').date()
             nova_reserva = Reservas(
                 num_sala=dados['num_sala'],
-                lab=dados['lab'],
+                lab=dados.get('lab', False),
                 data=data,
                 turma_id=dados['turma_id']
             )
@@ -74,7 +73,7 @@ class ReservasController:
             }), 201
         except Exception as e:
             banco_res.session.rollback()
-            return jsonify({'erro': f'Erro ao salvar no banco: {str(e)}'}), 500
+            return jsonify({'erro': f'Erro ao criar reserva: {str(e)}'}), 400
 
     @staticmethod
     def buscar_reserva(reserva_id):
@@ -85,7 +84,7 @@ class ReservasController:
                 'num_sala': reserva.num_sala,
                 'lab': reserva.lab,
                 'turma_id': reserva.turma_id,
-                'data': reserva.data.strftime('%Y-%m-%d') if reserva.data else None
+                'data': reserva.data.datetime.strptime('%Y-%m-%d') if reserva.data else None
             }), 200
         else:
             return jsonify({'erro': 'Reserva não encontrada.'}), 404
@@ -119,14 +118,17 @@ class ReservasController:
             return jsonify({'mensagem': 'Reserva atualizada com sucesso!'}), 200
         except Exception as e:
             banco_res.session.rollback()
-            return jsonify({'erro': f'Erro ao atualizar no banco: {str(e)}'}), 500
+            return jsonify({'erro': f'Erro ao atualizar reserva: {str(e)}'}), 400
 
     @staticmethod
     def deletar_reserva(reserva_id):
         reserva = Reservas.query.get(reserva_id)
         if reserva:
-            banco_res.session.delete(reserva)
-            banco_res.session.commit()
-            return jsonify({'mensagem': 'Reserva deletada com sucesso!'}), 200
+            try:
+                banco_res.session.delete(reserva)
+                banco_res.session.commit()
+                return jsonify({'mensagem': 'Reserva deletada com sucesso!'}), 200
+            except Exception as e:
+                return jsonify({'erro': f'Erro ao deletar reserva: {str(e)}'}), 400
         else:
             return jsonify({'erro': 'Reserva não encontrada.'}), 404

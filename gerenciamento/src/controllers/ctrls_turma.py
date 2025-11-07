@@ -11,7 +11,7 @@ class TurmaController:
                resultado = [
                     {
                          'id': turma.id,
-                         'nome': turma.nome,
+                         'descricao': turma.descricao,
                          'professor_id': turma.professor_id,
                          'ativo': turma.ativo,
                     } for turma in turmas
@@ -26,7 +26,7 @@ class TurmaController:
           if turma:
                return jsonify({
                     'id': turma.id,
-                    'nome': turma.nome,
+                    'descricao': turma.descricao,
                     'professor_id': turma.professor_id,
                     'ativo': turma.ativo
                }), 200
@@ -36,16 +36,16 @@ class TurmaController:
      @staticmethod
      def criar_turma():
           dados = request.get_json()
-          campos_obrigatorios = ['nome', 'professor_id']
+          campos_obrigatorios = ['descricao', 'professor_id']
           if not dados or not all(k in dados for k in campos_obrigatorios):
-               return jsonify({'erro': 'nome e professor_id são campos obrigatórios.'}), 400
+               return jsonify({'erro': 'descricao e professor_id são campos obrigatórios.'}), 400
           professor_id = dados['professor_id']
           professor = Professor.query.get(professor_id)
           if not professor:
                return jsonify({'erro': f'Professor com id {professor_id} não existe'}), 400
 
           nova_turma = Turma(
-               nome = dados['nome'],
+               descricao = dados['descricao'],
                professor_id = dados['professor_id'],
                ativo = dados.get('ativo', True)
           )
@@ -56,7 +56,7 @@ class TurmaController:
                {
                     'mensagem': 'Turma criada com sucesso!',
                     'id': nova_turma.id,
-                    'nome': nova_turma.nome,
+                    'descricao': nova_turma.descricao,
                     'professor_id': nova_turma.professor_id,
                     'ativo': nova_turma.ativo
                }
@@ -66,7 +66,7 @@ class TurmaController:
           turma = Turma.query.get(turma_id)
           if turma:
                dados = request.get_json()
-               turma.nome = dados.get('nome', turma.nome)
+               turma.descricao = dados.get('descricao', turma.descricao)
                turma.professor_id = dados.get('professor_id', turma.professor_id)
                turma.ativo = dados.get('ativo', turma.ativo)
 

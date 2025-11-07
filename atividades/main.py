@@ -20,7 +20,7 @@ swagger = Swagger(app, template_file='docs/swagger.yaml')
 
 @app.route('/')
 def index():
-    return 'API de Atividades funcionando! A documentação está disponível em: /apidocs'
+    return 'API de Atividades funcionando! A documentação está disponível em: /apidocs/'
 
 with app.app_context():
     banco_atv.create_all()

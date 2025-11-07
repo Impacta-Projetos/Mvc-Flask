@@ -359,7 +359,7 @@ definitions:
   TurmaBase:
     type: object
     properties:
-      nome:
+      descricao:
         type: string
         example: "Turma 101"
       professor_id:
@@ -367,7 +367,7 @@ definitions:
         example: 1
       ativo:
         type: boolean
-        example: true
+        default: true
 
   Turma:
     allOf:
@@ -382,7 +382,7 @@ definitions:
     allOf:
       - $ref: '#/definitions/TurmaBase'
     required:
-      - nome
+      - descricao
       - professor_id
 
   TurmaCriada:

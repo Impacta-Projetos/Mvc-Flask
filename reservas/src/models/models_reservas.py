@@ -7,7 +7,7 @@ class Reservas(banco_res.Model):
 
     id = banco_res.Column(banco_res.Integer, primary_key=True)
     num_sala = banco_res.Column(banco_res.Integer, nullable=False)
-    lab = banco_res.Column(banco_res.Boolean, nullable=False)
+    lab = banco_res.Column(banco_res.Boolean, default=False)
     data = banco_res.Column(banco_res.Date, nullable=False)
     turma_id = banco_res.Column(banco_res.Integer, nullable=False)
 

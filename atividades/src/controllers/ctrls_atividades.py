@@ -43,7 +43,7 @@ class AtividadesController:
                     'nome_atividade': atividade.nome_atividade,
                     'descricao': atividade.descricao,
                     'peso_porcento': atividade.peso_porcento,
-                    'data_entrega': atividade.data_entrega.strftime('%Y-%m-%d %H:%M:%S') if atividade.data_entrega else None,
+                    'data_entrega': atividade.data_entrega.strftime('%Y-%m-%d') if atividade.data_entrega else None,
                     'turma_id': atividade.turma_id,
                     'professor_id': atividade.professor_id
                 } for atividade in atividades
@@ -62,7 +62,7 @@ class AtividadesController:
                     'nome_atividade': atividade.nome_atividade,
                     'descricao': atividade.descricao,
                     'peso_porcento': atividade.peso_porcento,
-                    'data_entrega': atividade.data_entrega.strftime('%Y-%m-%d %H:%M:%S') if atividade.data_entrega else None,
+                    'data_entrega': atividade.data_entrega.strftime('%Y-%m-%d') if atividade.data_entrega else None,
                     'turma_id': atividade.turma_id,
                     'professor_id': atividade.professor_id
                 }
@@ -78,10 +78,13 @@ class AtividadesController:
             return jsonify({'erro': 'Todos os campos são obrigatórios.'}), 400
         
         valido_turma, msg_turma = validar_turma(dados['turma_id'])
-        valido_prof, msg_prof = validar_professor(dados['professor_id'])
-        if not valido_turma or not valido_prof:
-            return jsonify({'erro': 'Turma ou professor inválido.', 'detalhes': [msg_turma, msg_prof]}), 400
+        if not valido_turma:
+            return jsonify({'erro': 'Turma inválida.', 'detalhes': [msg_turma]}), 400
         
+        valido_prof, msg_prof = validar_professor(dados['professor_id'])
+        if not valido_prof:
+            return jsonify({'erro': 'Professor inválido.', 'detalhes': [msg_prof]}), 400
+
         # Converter string de data para objeto datetime
         try:
             data_entrega = datetime.strptime(dados['data_entrega'], '%Y-%m-%d')
@@ -113,10 +116,13 @@ class AtividadesController:
             professor_id = dados.get('professor_id', atividade.professor_id)
 
             valido_turma, msg_turma = validar_turma(turma_id)
-            valido_prof, msg_prof = validar_professor(professor_id)
-            if not valido_turma or not valido_prof:
-                return jsonify({'erro': 'Turma ou professor inválido.', 'detalhes': [msg_turma, msg_prof]}), 400
+            if not valido_turma:
+                return jsonify({'erro': 'Turma inválida.', 'detalhes': [msg_turma]}), 400
             
+            valido_prof, msg_prof = validar_professor(professor_id)
+            if not valido_prof:
+                return jsonify({'erro': 'Professor inválido.', 'detalhes': [msg_prof]}), 400
+
             # Converter string de data para objeto datetime se fornecido
             if 'data_entrega' in dados:
                 try:

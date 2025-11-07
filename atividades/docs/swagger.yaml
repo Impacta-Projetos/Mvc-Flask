@@ -1,8 +1,8 @@
 swagger: "2.0"
 info:
-  title: API de Atividades Escolares
+  title: API de Atividades e Notas
   version: "1.0"
-  description: API para gerenciamento de Atividades Escolares
+  description: API para gerenciamento de Atividades e Notas
 
 host: ""
 basePath: /
