@@ -11,5 +11,5 @@ class Reservas(banco_res.Model):
     data = banco_res.Column(banco_res.Date, nullable=False)
     turma_id = banco_res.Column(banco_res.Integer, nullable=False)
 
-     def __repr__(self):
+    def __repr__(self):
         return f"<Reserva(id={self.id}, num_sala={self.num_sala}, lab={self.lab}, data={self.data}, turma_id={self.turma_id})>"
