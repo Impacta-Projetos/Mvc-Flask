@@ -7,7 +7,7 @@ info:
 host: ""
 basePath: /
 schemes:
-  - http
+  - https
 
 paths:
   # -------- Reservas --------
@@ -152,5 +152,6 @@ definitions:
           mensagem:
             type: string
             example: "Reserva criada com sucesso!"
+
 
 
