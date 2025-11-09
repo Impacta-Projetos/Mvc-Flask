@@ -175,7 +175,15 @@ Cliente → POST /atividades (porta 5001)
 5. Cria a nota vinculada à atividade
 6. Retorna resposta ao cliente
 
-#### **4. Resolução de Nomes via Docker DNS**
+### **4. Fluxo de Criação de uma Reserva**
+
+1. Cliente faz POST para `/reservas` no microsserviço de Gerenciamento
+2. Controller de Reservas valida os dados
+3. **Valida a turma**: Faz GET para `http://gerenciamento:5000/turmas/{id}`
+4. Se a validação passar, cria a reserva no banco `reservas.db`
+5. Retorna resposta ao cliente
+
+#### **5. Resolução de Nomes via Docker DNS**
 
 O Docker Compose cria uma rede privada `backend` onde os containers se comunicam usando seus nomes:
 
@@ -185,7 +193,7 @@ O Docker Compose cria uma rede privada `backend` onde os containers se comunicam
 
 **Não é necessário usar IP**, pois o Docker resolve automaticamente o nome do container para o IP interno.
 
-#### **5. Tratamento de Erros de Comunicação**
+#### **6. Tratamento de Erros de Comunicação**
 
 Os microsserviços implementam tratamento robusto de erros:
 
@@ -292,7 +300,6 @@ Mvc-Flask/
 │           └── models.py
 │
 ├── docker-compose.yml                # Orquestração dos microsserviços
-├── Instruções.pdf                    # Documentação do projeto
 └── README.md                         # Este arquivo
 ```
 
@@ -478,7 +485,7 @@ POST /professores
 ```json
 POST /turmas
 {
-  "nome": "Turma 3A",
+  "descricao": "Turma 3A",
   "professor_id": 1,
   "ativo": true
 }
@@ -500,9 +507,7 @@ POST /alunos
   "nome": "Maria Santos",
   "idade": 16,
   "turma_id": 1,
-  "data_nascimento": "2008-05-15",
-  "nota_primeiro_semestre": 8.5,
-  "nota_segundo_semestre": 9.0
+  "data_nascimento": "2008-05-15"
 }
 ```
 
@@ -521,7 +526,9 @@ POST /alunos
 ```json
 POST /atividades
 {
+  "nome_atividade": "Prova de Cálculo",
   "descricao": "Prova de Cálculo 1",
+  "peso_porcento": 30,
   "data_entrega": "2025-12-15",
   "turma_id": 1,
   "professor_id": 1
@@ -565,6 +572,21 @@ POST /notas
 | POST | `/reservas` | Cria uma nova reserva |
 | PUT | `/reservas/{id}` | Atualiza uma reserva |
 | DELETE | `/reservas/{id}` | Remove uma reserva |
+
+**Exemplo de Criação (com validação HTTP):**
+```json
+POST /reservas
+{
+  "num_sala": 205,
+  "lab": true,
+  "data": "2025-12-15",
+  "turma_id": 1
+}
+```
+
+**Validações realizadas automaticamente:**
+- ✅ Consulta `GET http://gerenciamento:5000/turmas/1`
+- ✅ Só cria a reserva se a turma existir
 
 ---
 
@@ -671,7 +693,7 @@ response = requests.get(f'http://localhost:5000/professores/{professor_id}')
 ```python
 {
   "id": 1,
-  "nome": "Turma 3A",
+  "descricao": "Turma 3A",
   "professor_id": 1,
   "ativo": true
 }
@@ -684,10 +706,7 @@ response = requests.get(f'http://localhost:5000/professores/{professor_id}')
   "nome": "Maria Santos",
   "idade": 16,
   "turma_id": 1,
-  "data_nascimento": "2008-05-15",
-  "nota_primeiro_semestre": 8.5,
-  "nota_segundo_semestre": 9.0,
-  "média_final": 8.75
+  "data_nascimento": "2008-05-15"
 }
 ```
 
@@ -698,7 +717,7 @@ response = requests.get(f'http://localhost:5000/professores/{professor_id}')
 {
   "id": 1,
   "descricao": "Prova de Cálculo 1",
-  "data_entrega": "2025-12-15 00:00:00",
+  "data_entrega": "2025-12-15",
   "turma_id": 1,        # Referência ao microsserviço de Gerenciamento
   "professor_id": 1     # Referência ao microsserviço de Gerenciamento
 }
@@ -721,9 +740,9 @@ response = requests.get(f'http://localhost:5000/professores/{professor_id}')
 {
   "id": 1,
   "num_sala": "203",
-  "lab": "true"
+  "lab": true,
   "data_reserva": "2025-11-15",
-  "turma_id": 1
+  "turma_id": 1        # Referência ao microsserviço de Gerenciamento
 }
 ```
 
