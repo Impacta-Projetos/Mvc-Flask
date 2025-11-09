@@ -39,7 +39,7 @@ paths:
           schema:
             $ref: '#/definitions/ReservaCriada'
         400:
-          description: Dados inválidos
+          description: Erro ao criar reserva
 
   /reservas/{reserva_id}:
     get:

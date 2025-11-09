@@ -39,7 +39,7 @@ paths:
           schema:
             $ref: '#/definitions/ProfessorCriado'
         400:
-          description: Dados inválidos
+          description: Erro ao criar professor
 
   /professores/{professor_id}:
     get:
@@ -90,6 +90,8 @@ paths:
       responses:
         200:
           description: Professor deletado com sucesso
+        400:
+          description: Erro ao deletar professor
         404:
           description: Professor não encontrado
         409:
@@ -100,8 +102,6 @@ paths:
               erro:
                 type: string
                 example: "Não é possível deletar o professor pois existem turmas vinculadas."
-        500:
-          description: Erro interno do servidor
 
   # -------- Turmas --------
   /turmas:
@@ -140,8 +140,6 @@ paths:
               erro:
                 type: string
                 example: "Professor com id 5 não existe."
-        500:
-          description: Erro interno do servidor
 
   /turmas/{turma_id}:
     get:
@@ -210,8 +208,6 @@ paths:
               erro:
                 type: string
                 example: "Não é possível deletar a turma pois existem alunos vinculados."
-        500:
-          description: Erro interno do servidor
 
   # -------- Alunos --------
   /alunos:

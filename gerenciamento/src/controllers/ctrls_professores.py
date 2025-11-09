@@ -92,4 +92,4 @@ class ProfessorController:
              return jsonify({"erro": "Não é possível deletar o professor pois existem turmas vinculadas."}), 409
          except Exception as e:
              banco_de_dados.session.rollback()
-             return jsonify({"erro": f"Erro ao deletar professor: {str(e)}"}), 500
+             return jsonify({"erro": f"Erro ao deletar professor: {str(e)}"}), 400
