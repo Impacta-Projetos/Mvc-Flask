@@ -8,7 +8,7 @@ from flask import Flask
 from config.config import Config
 from models import banco_res
 from flasgger import Swagger
-from api.reservas import rotas_reservas
+from api.api_reservas import rotas_reservas
 
 app = Flask(__name__)
 
@@ -20,7 +20,7 @@ swagger = Swagger(app, template_file='docs/swagger.yaml')
 
 @app.route('/')
 def index():
-    return 'API de Reservas funcionando! A documentação está disponível em: /apidocs'
+    return 'API de Reservas funcionando! A documentação está disponível em: /apidocs/'
 
 with app.app_context():
     banco_res.create_all()

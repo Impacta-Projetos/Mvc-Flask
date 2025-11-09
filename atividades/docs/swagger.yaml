@@ -1,13 +1,13 @@
 swagger: "2.0"
 info:
-  title: API de Atividades Escolares
+  title: API de Atividades e Notas
   version: "1.0"
-  description: API para gerenciamento de Atividades Escolares
+  description: API para gerenciamento de Atividades e Notas
 
 host: ""
 basePath: /
 schemes:
-  - http
+  - https
 
 paths:
   # -------- Atividades --------
@@ -39,7 +39,7 @@ paths:
           schema:
             $ref: '#/definitions/AtividadeCriada'
         400:
-          description: Dados inválidos
+          description: Erro ao criar atividade
 
   /atividades/{atividade_id}:
     get:
@@ -75,6 +75,8 @@ paths:
       responses:
         200:
           description: Atividade atualizada com sucesso
+        400:
+          description: Erro ao atualizar atividade
         404:
           description: Atividade não encontrada
     delete:
@@ -90,6 +92,8 @@ paths:
       responses:
         200:
           description: Atividade deletada com sucesso
+        400:
+          description: Erro ao deletar atividade
         404:
           description: Atividade não encontrada
         409:
@@ -100,8 +104,93 @@ paths:
               erro:
                 type: string
                 example: "Não é possível deletar a atividade pois existem notas vinculadas."
-        500:
-          description: Erro interno do servidor
+
+  # -------- Notas --------
+  /notas:
+    get:
+      summary: Listar todas as notas
+      tags:
+        - Notas
+      responses:
+        200:
+          description: Lista de notas
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Nota'
+    post:
+      summary: Criar uma nova nota
+      tags:
+        - Notas
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/NotaInput'
+      responses:
+        201:
+          description: Nota criada com sucesso
+          schema:
+            $ref: '#/definitions/NotaCriada'
+        400:
+          description: Erro ao criar nota
+
+  /notas/{nota_id}:
+    get:
+      summary: Obter nota por ID
+      tags:
+        - Notas
+      parameters:
+        - in: path
+          name: nota_id
+          type: integer
+          required: true
+      responses:
+        200:
+          description: Nota encontrada
+          schema:
+            $ref: '#/definitions/Nota'
+        404:
+          description: Nota não encontrada
+    put:
+      summary: Atualizar nota existente
+      tags:
+        - Notas
+      parameters:
+        - in: path
+          name: nota_id
+          type: integer
+          required: true
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/NotaInput'
+      responses:
+        200:
+          description: Nota atualizada com sucesso
+        400:
+          description: Erro ao atualizar nota
+        404:
+          description: Nota não encontrada
+    delete:
+      summary: Deletar nota
+      description: Deleta uma nota
+      tags:
+        - Notas
+      parameters:
+        - in: path
+          name: nota_id
+          type: integer
+          required: true
+      responses:
+        200:
+          description: Nota deletada com sucesso
+        400:
+          description: Erro ao deletar nota
+        404:
+          description: Nota não encontrada
 
 # -------- Schemas --------
 definitions:
@@ -156,3 +245,42 @@ definitions:
           mensagem:
             type: string
             example: "Atividade criada com sucesso!"
+
+  NotasBase:
+    type: object
+    properties:
+      nota:
+        type: float
+        example: 8.5
+      aluno_id: 
+        type: integer
+        example: 1
+      atividade_id:
+        type: integer
+        example: 1
+
+  Nota:
+    allOf:
+      - $ref: '#/definitions/NotasBase'
+      - type: object
+        properties:
+          id:
+            type: integer
+            example: 1
+
+  NotaInput:
+    allOf:
+      - $ref: '#/definitions/NotasBase'
+    required:
+      - nota
+      - aluno_id
+      - atividade_id
+
+  NotaCriada:
+    allOf:
+      - $ref: '#/definitions/Nota'
+      - type: object
+        properties:
+          mensagem:
+            type: string
+            example: "Nota criada com sucesso!"

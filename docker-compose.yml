@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  atividades:
+    build: ./atividades
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./atividades:/app
+    networks:
+      - backend
+    container_name: atividades
+
+  gerenciamento:
+    build: ./gerenciamento
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./gerenciamento:/app
+    networks:
+      - backend
+    container_name: gerenciamento
+
+  reservas:
+    build: ./reservas
+    ports:
+      - "5002:5002"
+    volumes:
+      - ./reservas:/app
+    networks:
+      - backend
+    container_name: reservas
+
+networks:
+  backend:
+    driver: bridge

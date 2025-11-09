@@ -1,0 +1,144 @@
+swagger: "2.0"
+info:
+  title: API de Reservas de Salas
+  version: "1.0"
+  description: API para gerenciamento de Reservas de Salas
+
+host: ""
+basePath: /
+schemes:
+  - https
+
+paths:
+  # -------- Reservas --------
+  /reservas:
+    get:
+      summary: Listar todas as reservas
+      tags:
+        - Reservas
+      responses:
+        200:
+          description: Lista de reservas
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Reserva'
+    post:
+      summary: Criar uma nova reserva
+      tags:
+        - Reservas
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/ReservaInput'
+      responses:
+        201:
+          description: Reserva criada com sucesso
+          schema:
+            $ref: '#/definitions/ReservaCriada'
+        400:
+          description: Erro ao criar reserva
+
+  /reservas/{reserva_id}:
+    get:
+      summary: Obter reserva por ID
+      tags:
+        - Reservas
+      parameters:
+        - in: path
+          name: reserva_id
+          type: integer
+          required: true
+      responses:
+        200:
+          description: Reserva encontrada
+          schema:
+            $ref: '#/definitions/Reserva'
+        404:
+          description: Reserva não encontrada
+    put:
+      summary: Atualizar Reserva existente
+      tags:
+        - Reservas
+      parameters:
+        - in: path
+          name: reserva_id
+          type: integer
+          required: true
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/ReservaInput'
+      responses:
+        200:
+          description: Reserva atualizada com sucesso
+        400:
+          description: Erro ao atualizar reserva
+        404:
+          description: Reserva não encontrada
+    delete:
+      summary: Deletar reserva
+      description: Deleta uma reserva
+      tags:
+        - Reservas
+      parameters:
+        - in: path
+          name: reserva_id
+          type: integer
+          required: true
+      responses:
+        200:
+          description: Reserva deletada com sucesso
+        400:
+          description: Erro ao deletar reserva
+        404:
+          description: Reserva não encontrada
+
+# -------- Schemas --------
+definitions:
+  ReservaBase:
+    type: object
+    properties:
+      num_sala:
+        type: integer
+        example: 205
+      lab:
+        type: boolean
+        default: False
+      data:
+        type: string
+        format: date
+        example: "2023-09-30"
+      turma_id:
+        type: integer
+        example: 1
+
+
+  Reserva:
+    allOf:
+      - $ref: '#/definitions/ReservaBase'
+      - type: object
+        properties:
+          id:
+            type: integer
+            example: 1
+
+  ReservaInput:
+    allOf:
+      - $ref: '#/definitions/ReservaBase'
+    required:
+      - num_sala
+      - data
+      - turma_id
+
+  ReservaCriada:
+    allOf:
+      - $ref: '#/definitions/Reserva'
+      - type: object
+        properties:
+          mensagem:
+            type: string
+            example: "Reserva criada com sucesso!"

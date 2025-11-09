@@ -1,5 +1,6 @@
 from flask import request, jsonify
 from models import Aluno, Turma, banco_de_dados
+from datetime import datetime
 
 class AlunoController:
      # A chamada para esse método seria feita diretamente pela classe, sem a necessidade de criar um objeto (uma instância):
@@ -14,10 +15,6 @@ class AlunoController:
                       'idade': aluno.idade,
                       'turma_id': aluno.turma_id,
                       'data_nascimento': aluno.data_nascimento.strftime('%Y-%m-%d') if aluno.data_nascimento else None,
-                      'nota_primeiro_semestre': aluno.nota_primeiro_semestre,
-                      'nota_segundo_semestre': aluno.nota_segundo_semestre,
-                      "media_final": (aluno.nota_primeiro_semestre + aluno.nota_segundo_semestre) / 2
-
                   } for aluno in alunos
               ]
               return jsonify(resultado), 200
@@ -27,16 +24,15 @@ class AlunoController:
      @staticmethod
      def criar_aluno():
          dados = request.get_json()
-         campos_obrigatorios = ['nome', 'idade', 'turma_id', 'data_nascimento', 'nota_primeiro_semestre', 'nota_segundo_semestre']
+         campos_obrigatorios = ['nome', 'idade', 'turma_id', 'data_nascimento']
          if not dados or not all(k in dados for k in campos_obrigatorios):
-             return jsonify({'erro': 'nome, idade, turma_id, data_nascimento, nota_primeiro_semestre e nota_segundo_semestre são campos obrigatórios.'}), 400
+             return jsonify({'erro': 'nome, idade, turma_id, data_nascimento são campos obrigatórios.'}), 400
          turma_id = dados['turma_id']
          turma = Turma.query.get(turma_id)
          if not turma:
              return jsonify({'erro': f'Turma com id {turma_id} não existe.'}), 400
 
          try:
-             from datetime import datetime
              # Converter string de data para objeto date
              data_nascimento = datetime.strptime(dados['data_nascimento'], '%Y-%m-%d').date()
              
@@ -45,8 +41,6 @@ class AlunoController:
                 idade = dados['idade'],
                 turma_id = dados['turma_id'],
                 data_nascimento = data_nascimento,
-                nota_primeiro_semestre = dados['nota_primeiro_semestre'],
-                nota_segundo_semestre = dados['nota_segundo_semestre']
              )
          except ValueError:
              return jsonify({'erro': 'Formato de data inválido. Use YYYY-MM-DD.'}), 400
@@ -59,14 +53,13 @@ class AlunoController:
              
              return jsonify({
                  'mensagem': 'Aluno criado com sucesso!',
-                 'id': novo_aluno.id,
-                 'nome': novo_aluno.nome,
-                 'idade': novo_aluno.idade,
-                 'turma_id': novo_aluno.turma_id,
-                 'data_nascimento': novo_aluno.data_nascimento.strftime('%Y-%m-%d'),
-                 'nota_primeiro_semestre': novo_aluno.nota_primeiro_semestre,
-                 'nota_segundo_semestre': novo_aluno.nota_segundo_semestre,
-                 "média_final": (novo_aluno.nota_primeiro_semestre + novo_aluno.nota_segundo_semestre) / 2
+                 'dados': {
+                     'id': novo_aluno.id,
+                     'nome': novo_aluno.nome,
+                     'idade': novo_aluno.idade,
+                     'turma_id': novo_aluno.turma_id,
+                     'data_nascimento': novo_aluno.data_nascimento.strftime('%Y-%m-%d'),
+                 }
              }), 201
          except Exception as e:
              banco_de_dados.session.rollback()
@@ -82,9 +75,6 @@ class AlunoController:
                  'idade': aluno.idade,
                  'turma_id': aluno.turma_id,
                  'data_nascimento': aluno.data_nascimento.strftime('%Y-%m-%d'),
-                 'nota_primeiro_semestre': aluno.nota_primeiro_semestre,
-                 'nota_segundo_semestre': aluno.nota_segundo_semestre,
-                 'media_final': (aluno.nota_primeiro_semestre + aluno.nota_segundo_semestre) / 2
              }), 200
          else:
              return jsonify({'erro': 'Aluno não encontrado.'}), 404
@@ -93,12 +83,16 @@ class AlunoController:
      def atualizar_aluno(aluno_id):
          aluno = Aluno.query.get(aluno_id)
          if aluno:
+             try:
+                 data_nascimento = datetime.strptime(request.json.get('data_nascimento', aluno.data_nascimento.strftime('%Y-%m-%d')), '%Y-%m-%d').date()
+             except ValueError:
+                 return jsonify({'erro': 'Formato de data inválido. Use YYYY-MM-DD.'}), 400
+
              dados = request.get_json()
              aluno.nome = dados.get('nome', aluno.nome)
              aluno.idade = dados.get('idade', aluno.idade)
              aluno.turma_id = dados.get('turma_id', aluno.turma_id)
-             aluno.nota_primeiro_semestre = dados.get('nota_primeiro_semestre', aluno.nota_primeiro_semestre)
-             aluno.nota_segundo_semestre = dados.get('nota_segundo_semestre', aluno.nota_segundo_semestre)
+             aluno.data_nascimento = data_nascimento
 
              turma = Turma.query.get(dados.get('turma_id'))
              if not turma:
