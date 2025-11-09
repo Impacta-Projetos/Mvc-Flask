@@ -71,7 +71,15 @@ class NotasController:
         try:
             banco_atv.session.add(nova_nota)
             banco_atv.session.commit()
-            return jsonify({'mensagem': 'Nota criada com sucesso.'}), 201
+            return jsonify({
+                'mensagem': 'Nota criada com sucesso.',
+                'dados': {
+                    'id': nova_nota.id,
+                    'nota': nova_nota.nota,
+                    'aluno_id': nova_nota.aluno_id,
+                    'atividade_id': nova_nota.atividade_id
+                }
+            }), 201
         except Exception as e:
             banco_atv.session.rollback()
             return jsonify({'erro': f'Erro ao criar nota: {str(e)}'}), 400

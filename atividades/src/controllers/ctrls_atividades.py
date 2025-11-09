@@ -102,7 +102,18 @@ class AtividadesController:
         try:
             banco_atv.session.add(nova_atividade)
             banco_atv.session.commit()
-            return jsonify({'mensagem': 'Atividade criada com sucesso.'}), 201
+            return jsonify({
+                'mensagem': 'Atividade criada com sucesso.',
+                'dados': {
+                    'id': nova_atividade.id,
+                    'nome_atividade': nova_atividade.nome_atividade,
+                    'descricao': nova_atividade.descricao,
+                    'peso_porcento': nova_atividade.peso_porcento,
+                    'data_entrega': nova_atividade.data_entrega.strftime('%Y-%m-%d'),
+                    'turma_id': nova_atividade.turma_id,
+                    'professor_id': nova_atividade.professor_id
+                }
+            }), 201
         except Exception as e:
             banco_atv.session.rollback()
             return jsonify({'erro': f'Erro ao criar atividade: {str(e)}'}), 400

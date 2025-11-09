@@ -54,11 +54,13 @@ class ProfessorController:
 
          return jsonify({
              'mensagem': 'Professor criado com sucesso!',
-             'id': novo_professor.id,
-             'nome': novo_professor.nome,
-             'idade': novo_professor.idade,
-             'materia': novo_professor.materia,
-             'observacoes': novo_professor.observacoes
+             'dados': {
+                 'id': novo_professor.id,
+                 'nome': novo_professor.nome,
+                 'idade': novo_professor.idade,
+                 'materia': novo_professor.materia,
+                 'observacoes': novo_professor.observacoes
+             }
          }), 201
      
      @staticmethod

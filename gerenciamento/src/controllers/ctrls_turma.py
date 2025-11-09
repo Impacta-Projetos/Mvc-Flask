@@ -55,10 +55,12 @@ class TurmaController:
           return jsonify(
                {
                     'mensagem': 'Turma criada com sucesso!',
-                    'id': nova_turma.id,
-                    'descricao': nova_turma.descricao,
-                    'professor_id': nova_turma.professor_id,
-                    'ativo': nova_turma.ativo
+                    'dados': {
+                         'id': nova_turma.id,
+                         'descricao': nova_turma.descricao,
+                         'professor_id': nova_turma.professor_id,
+                         'ativo': nova_turma.ativo
+                    }
                }
           ), 201
      @staticmethod

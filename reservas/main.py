@@ -8,7 +8,7 @@ from flask import Flask
 from config.config import Config
 from models import banco_res
 from flasgger import Swagger
-from api.reservas import rotas_reservas
+from api.api_reservas import rotas_reservas
 
 app = Flask(__name__)
 

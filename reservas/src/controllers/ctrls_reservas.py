@@ -65,11 +65,13 @@ class ReservasController:
             banco_res.session.commit()
             return jsonify({
                 'mensagem': 'Reserva criada com sucesso!',
-                'id': nova_reserva.id,
-                'num_sala': nova_reserva.num_sala,
-                'lab': nova_reserva.lab,
-                'turma_id': nova_reserva.turma_id,
-                'data': nova_reserva.data.strftime('%Y-%m-%d') if nova_reserva.data else None,
+                'dados': {
+                    'id': nova_reserva.id,
+                    'num_sala': nova_reserva.num_sala,
+                    'lab': nova_reserva.lab,
+                    'turma_id': nova_reserva.turma_id,
+                    'data': nova_reserva.data.strftime('%Y-%m-%d') if nova_reserva.data else None,
+                }
             }), 201
         except Exception as e:
             banco_res.session.rollback()
@@ -84,7 +86,7 @@ class ReservasController:
                 'num_sala': reserva.num_sala,
                 'lab': reserva.lab,
                 'turma_id': reserva.turma_id,
-                'data': reserva.data.datetime.strptime('%Y-%m-%d') if reserva.data else None
+                'data': reserva.data.strftime('%Y-%m-%d') if reserva.data else None,
             }), 200
         else:
             return jsonify({'erro': 'Reserva não encontrada.'}), 404

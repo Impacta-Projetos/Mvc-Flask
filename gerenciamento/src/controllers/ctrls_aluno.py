@@ -1,5 +1,6 @@
 from flask import request, jsonify
 from models import Aluno, Turma, banco_de_dados
+from datetime import datetime
 
 class AlunoController:
      # A chamada para esse método seria feita diretamente pela classe, sem a necessidade de criar um objeto (uma instância):
@@ -32,7 +33,6 @@ class AlunoController:
              return jsonify({'erro': f'Turma com id {turma_id} não existe.'}), 400
 
          try:
-             from datetime import datetime
              # Converter string de data para objeto date
              data_nascimento = datetime.strptime(dados['data_nascimento'], '%Y-%m-%d').date()
              
@@ -53,11 +53,13 @@ class AlunoController:
              
              return jsonify({
                  'mensagem': 'Aluno criado com sucesso!',
-                 'id': novo_aluno.id,
-                 'nome': novo_aluno.nome,
-                 'idade': novo_aluno.idade,
-                 'turma_id': novo_aluno.turma_id,
-                 'data_nascimento': novo_aluno.data_nascimento.strftime('%Y-%m-%d'),
+                 'dados': {
+                     'id': novo_aluno.id,
+                     'nome': novo_aluno.nome,
+                     'idade': novo_aluno.idade,
+                     'turma_id': novo_aluno.turma_id,
+                     'data_nascimento': novo_aluno.data_nascimento.strftime('%Y-%m-%d'),
+                 }
              }), 201
          except Exception as e:
              banco_de_dados.session.rollback()
@@ -81,10 +83,16 @@ class AlunoController:
      def atualizar_aluno(aluno_id):
          aluno = Aluno.query.get(aluno_id)
          if aluno:
+             try:
+                 data_nascimento = datetime.strptime(request.json.get('data_nascimento', aluno.data_nascimento.strftime('%Y-%m-%d')), '%Y-%m-%d').date()
+             except ValueError:
+                 return jsonify({'erro': 'Formato de data inválido. Use YYYY-MM-DD.'}), 400
+
              dados = request.get_json()
              aluno.nome = dados.get('nome', aluno.nome)
              aluno.idade = dados.get('idade', aluno.idade)
              aluno.turma_id = dados.get('turma_id', aluno.turma_id)
+             aluno.data_nascimento = data_nascimento
 
              turma = Turma.query.get(dados.get('turma_id'))
              if not turma:
