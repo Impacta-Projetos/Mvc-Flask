@@ -561,6 +561,7 @@ POST /notas
 
 **Validação realizada automaticamente:**
 - ✅ Consulta `GET http://gerenciamento:5000/alunos/1`
+- ✅ Só cria a nota se o aluno existir
 
 ### 🏢 Microsserviço de Reservas (Porta 5002)
 
